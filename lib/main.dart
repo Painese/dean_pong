@@ -1,3 +1,5 @@
+import 'package:dean_pong/services/firebaseService.dart';
+import 'package:dean_pong/services/firebaseService.dart' as prefix0;
 import 'package:flutter/material.dart';
 
 void main() => runApp(MyApp());
@@ -45,6 +47,13 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
+
+  @override
+  void initState() {
+    final FirebaseService service = FirebaseService();
+    service.testDB();
+    super.initState();
+  }
 
   void _incrementCounter() {
     setState(() {
