@@ -1,6 +1,10 @@
+import 'package:dean_pong/models/boardState.dart';
 import 'package:dean_pong/services/firebaseService.dart';
 import 'package:dean_pong/services/firebaseService.dart' as prefix0;
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import 'models/board.dart';
 
 void main() => runApp(MyApp());
 
@@ -8,21 +12,28 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.blue,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider.value(
+          value: Board(),
+        )
+      ],
+      child: MaterialApp(
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          // This is the theme of your application.
+          //
+          // Try running your application with "flutter run". You'll see the
+          // application has a blue toolbar. Then, without quitting the app, try
+          // changing the primarySwatch below to Colors.green and then invoke
+          // "hot reload" (press "r" in the console where you ran "flutter run",
+          // or simply save your changes to "hot reload" in a Flutter IDE).
+          // Notice that the counter didn't reset back to zero; the application
+          // is not restarted.
+          primarySwatch: Colors.blue,
+        ),
+        home: MyHomePage(title: 'Flutter Demo Home Page'),
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
 }
@@ -47,33 +58,54 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
-
+  bool _didLoad = false;
+  Color _btnColor = Colors.purple;
   @override
   void initState() {
-    final FirebaseService service = FirebaseService();
-    service.testDB();
     super.initState();
   }
 
-  void _incrementCounter() {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_didLoad) {
+      Provider.of<Board>(context, listen: false).setBoard();
+      _didLoad = true;
+    }
+  }
+
+  void _incrementCounter(Board board) {
+    _toggleBoardState(board);
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
       _counter++;
+    });
+  }
+
+  void _toggleBoardState(Board board) {
+    final newState = board.boardDetails.state == BoardState.free ? BoardState.matchInProgress : BoardState.free;
+    Color newColor;
+
+    board.setBoardState(newState).then( (_) {
+      if (newState == BoardState.free) {
+        newColor = Colors.green;
+      } else {
+        newColor = Colors.red;
+      }
+      setState(() {
+        _btnColor = newColor;
+      });
+    }).catchError((error) {
+      print(error.toString());
+      setState(() {
+        _btnColor = Colors.yellow;
+      });
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
+    final board = Provider.of<Board>(context);
+
     return Scaffold(
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
@@ -111,9 +143,10 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
+        onPressed: () => _incrementCounter(board),
         tooltip: 'Increment',
         child: Icon(Icons.add),
+        backgroundColor: _btnColor,
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }

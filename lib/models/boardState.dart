@@ -1,0 +1,4 @@
+enum BoardState {
+  matchInProgress,
+  free,
+}
