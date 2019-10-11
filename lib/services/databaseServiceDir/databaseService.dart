@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:codable/codable.dart';
-import 'package:dean_pong/models/board.dart';
+import 'package:dean_pong/models/boardDetails.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 

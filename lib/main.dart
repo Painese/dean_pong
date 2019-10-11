@@ -4,7 +4,7 @@ import 'package:dean_pong/services/firebaseService.dart' as prefix0;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'models/board.dart';
+import 'providers/board.dart';
 
 void main() => runApp(MyApp());
 

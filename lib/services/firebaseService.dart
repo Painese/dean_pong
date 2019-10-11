@@ -1,4 +1,4 @@
-import 'package:dean_pong/models/board.dart';
+import 'package:dean_pong/models/boardDetails.dart';
 import 'package:dean_pong/services/databaseServiceDir/databaseService.dart';
 import 'package:http/http.dart';
 
