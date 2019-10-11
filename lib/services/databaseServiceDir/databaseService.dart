@@ -7,6 +7,7 @@ import 'package:http/http.dart';
 
 class DatabaseService {
   static const String _databaseBaseURL = "https://deanpong-b0c79.firebaseio.com/";
+  String _authToken;
 
   Future<Response> updateBoardInDatabase(BoardDetails board) async {
     final String boardURL = "${_databaseBaseURL}Board.json";
@@ -20,4 +21,9 @@ class DatabaseService {
 
     return await http.get(boardURL);
   }
+
+  set authToken(String value) {
+    _authToken = value;
+  }
+
 }

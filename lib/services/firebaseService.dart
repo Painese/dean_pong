@@ -5,11 +5,28 @@ import 'package:http/http.dart';
 class FirebaseService {
   DatabaseService _databaseService = DatabaseService();
 
+  /// Singleton implementation
+
+  static final FirebaseService instance = FirebaseService ._internal();
+
+  factory FirebaseService() {
+    return instance;
+  }
+
+  FirebaseService._internal();
+
+  /// API
+
   Future<Response> updateBoardInDatabase(BoardDetails boardDetails) async {
     return _databaseService.updateBoardInDatabase(boardDetails);
   }
 
   Future<Response> fetchBoardFromDatabase() async {
     return _databaseService.fetchBoardFromDatabase();
+  }
+
+  set authToken(String value) {
+    // Update other services
+    _databaseService.authToken = value;
   }
 }

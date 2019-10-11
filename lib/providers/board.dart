@@ -10,17 +10,14 @@ class Board with ChangeNotifier {
   BoardDetails _boardDetails;
   BoardDetails _previousBoardDetails; // For undo purposes
   BoardDetails get boardDetails => _boardDetails;
+  FirebaseService _fb = FirebaseService.instance;
 
-  FirebaseService _fb = FirebaseService();
-
-  Future<void> setBoard() async {
+  Future<void> initialize() async {
     final Response response = await _fb.fetchBoardFromDatabase();
     final jsonData = json.decode(response.body);
     final archive = KeyedArchive.unarchive(jsonData);
     _boardDetails = BoardDetails()..decode(archive);
     notifyListeners();
-    print(boardDetails.numberOfWitnesses);
-    print(boardDetails.state);
   }
 
   /// If the boards state is equal to the new state, update the number of witnesses. Else, set the new state.
@@ -34,12 +31,47 @@ class Board with ChangeNotifier {
       _boardDetails.numberOfWitnesses++;
     } else {
       _boardDetails.state = newState;
+      _boardDetails.numberOfWitnesses = 0;
+
+      if(_boardDetails.currentPlayersIds != null) {
+        _boardDetails.currentPlayersIds.clear();
+      }
     }
 
+    return await _updateBoardInDatabase();
+  }
+
+  Future<void> joinCurrentGame(String userId) async {
+    if (_boardDetails.currentPlayersIds.contains(userId)) {
+      print("User aready exists in current game");
+      return;
+    }
+
+    _saveCurrentBoardDetails();
+
+    _boardDetails.currentPlayersIds.add(userId);
+
+    return await _updateBoardInDatabase();
+  }
+
+  Future<void> leaveCurrentGame(String userId) async {
+    if (!_boardDetails.currentPlayersIds.contains(userId)) {
+      print("User was not found in current game");
+      return;
+    }
+
+    _saveCurrentBoardDetails();
+
+    _boardDetails.currentPlayersIds.remove(userId);
+
+    return await _updateBoardInDatabase();
+  }
+
+  /// Helper methods
+
+  Future<void> _updateBoardInDatabase() async {
     try {
       final Response response = await _fb.updateBoardInDatabase(_boardDetails);
-      print("FB response $response");
-      print("FB parsed response ${json.decode(response.body)}");
 
       if (response.statusCode >= 400) {
         _undoLastBoardDetailsChange();
