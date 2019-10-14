@@ -26,6 +26,8 @@ class MyApp extends StatelessWidget {
         title: 'Flutter Demo',
         theme: ThemeData(
           primarySwatch: Colors.blue,
+//          primaryColor: Color.fromRGBO(191, 0, 0, 1),
+//          accentColor: Color.fromRGBO(0, 0, 0, 1),
         ),
         home: Consumer<Auth>(
           builder: (ctx, auth, _) {

@@ -15,10 +15,11 @@ class AuthScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final deviceSize = MediaQuery.of(context).size;
-    // final transformConfig = Matrix4.rotationZ(-8 * pi / 180);
-    // transformConfig.translate(-10.0);
+    final padding = MediaQuery.of(context).padding;
+    final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
+    final viewInsets = MediaQuery.of(context).viewInsets;
     return Scaffold(
-      // resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: Stack(
           children: <Widget>[
@@ -37,26 +38,28 @@ class AuthScreen extends StatelessWidget {
             ),
             SingleChildScrollView(
               child: Container(
-                height: deviceSize.height,
+                height: deviceSize.height - padding.top - padding.bottom - viewInsets.bottom - viewInsets.top,
                 width: deviceSize.width,
                 child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
                     Flexible(
-                      child: Container(
-                        child: Text(
-                          'DeanPong',
-                          style: TextStyle(
-                            color: Theme.of(context).accentTextTheme.title.color,
-                            fontSize: 36,
-                            fontFamily: 'Kaushan Script',
-                            fontWeight: FontWeight.normal,
+                      flex: 1,
+                      child: Center(
+                        child: Container(
+                          child: Text(
+                            'DeanPong',
+                            style: TextStyle(
+                              color: Theme.of(context).accentTextTheme.title.color,
+                              fontSize: 36,
+                              fontFamily: 'Kaushan Script',
+                              fontWeight: FontWeight.normal,
+                            ),
                           ),
                         ),
                       ),
                     ),
                     Flexible(
+                      flex: isPortrait ? 1 : 2,
                       child: AuthWidget(),
                     ),
                   ],
@@ -181,7 +184,11 @@ class _AuthWidgetState extends State<AuthWidget> {
               Padding(
                 padding: const EdgeInsets.only(bottom: 10.0),
                 child: TextFormField(
-                  decoration: InputDecoration(filled: true, fillColor: Colors.white, labelText: 'E-Mail'),
+                  decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.white,
+                      labelText: 'E-Mail',
+                  ),
                   keyboardType: TextInputType.emailAddress,
                   validator: (value) {
                     if (value.isEmpty || !value.contains('@')) {
@@ -197,7 +204,11 @@ class _AuthWidgetState extends State<AuthWidget> {
               Padding(
                 padding: const EdgeInsets.only(bottom: 10.0),
                 child: TextFormField(
-                  decoration: InputDecoration(filled: true, fillColor: Colors.white, labelText: 'Password'),
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.white,
+                    labelText: 'Password',
+                  ),
                   obscureText: true,
                   controller: _passwordController,
                   validator: (value) {
@@ -214,7 +225,11 @@ class _AuthWidgetState extends State<AuthWidget> {
               if (_authMode == AuthMode.Signup)
                 TextFormField(
                   enabled: _authMode == AuthMode.Signup,
-                  decoration: InputDecoration(filled: true, fillColor: Colors.white, labelText: 'Confirm Password'),
+                  decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.white,
+                      labelText: 'Confirm Password',
+                  ),
                   obscureText: true,
                   validator: _authMode == AuthMode.Signup
                       ? (value) {
@@ -233,7 +248,10 @@ class _AuthWidgetState extends State<AuthWidget> {
               else
                 RaisedButton(
                   child:
-                  Text(_authMode == AuthMode.Login ? 'LOGIN' : 'SIGN UP'),
+                  Text(
+                      _authMode == AuthMode.Login ? 'LOGIN' : 'SIGN UP',
+                      style: TextStyle(decoration: TextDecoration.underline)
+                  ),
                   onPressed: _submit,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
