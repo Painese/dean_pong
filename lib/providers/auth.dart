@@ -60,6 +60,7 @@ class Auth with ChangeNotifier {
       );
       _autoLogout();
       notifyListeners();
+      print("Logged in! User ID $_userId");
       final prefs = await SharedPreferences.getInstance();
       final userData = json.encode(
         {

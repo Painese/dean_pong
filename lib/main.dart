@@ -1,5 +1,7 @@
 import 'package:dean_pong/models/boardState.dart';
 import 'package:dean_pong/providers/auth.dart';
+import 'package:dean_pong/screens/auth_screen.dart';
+import 'package:dean_pong/screens/board_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -25,7 +27,19 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: MyHomePage(title: 'Flutter Demo Home Page'),
+        home: Consumer<Auth>(
+          builder: (ctx, auth, _) {
+            return auth.isAuth ? BoardScreen() :
+            FutureBuilder(
+              future: auth.tryAutoLogin(),
+              builder: (ctx, authResultSnapshot) =>
+              authResultSnapshot.connectionState ==
+                  ConnectionState.waiting
+                  ? Text('Hi')
+                  : AuthScreen(),
+            );
+          },
+        ),
       ),
     );
   }
