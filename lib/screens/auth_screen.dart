@@ -19,7 +19,7 @@ class AuthScreen extends StatelessWidget {
     final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
     final viewInsets = MediaQuery.of(context).viewInsets;
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: Stack(
           children: <Widget>[
@@ -38,7 +38,7 @@ class AuthScreen extends StatelessWidget {
             ),
             SingleChildScrollView(
               child: Container(
-                height: deviceSize.height - padding.top - padding.bottom - viewInsets.bottom - viewInsets.top,
+                height: deviceSize.height - padding.top - padding.bottom,
                 width: deviceSize.width,
                 child: Column(
                   children: <Widget>[
