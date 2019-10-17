@@ -1,4 +1,7 @@
+import 'package:dean_pong/providers/board.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class BoardScreen extends StatefulWidget {
   @override
@@ -11,9 +14,21 @@ class BoardScreen extends StatefulWidget {
 class _BoardScreenState extends State<BoardScreen> {
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Text('Board'),
+    final Board board = Provider.of<Board>(context, listen: false);
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Board'),
+      ),
+      body: FutureBuilder(
+          future: board.initialize(),
+          builder: (cx, boardResultSnapshot) {
+            return boardResultSnapshot.connectionState == ConnectionState.waiting? Center(child: CircularProgressIndicator(),) : _createBoardBody();
+          },
+        ),
     );
   }
 
+  Widget _createBoardBody() {
+    return Center(child: Text('Board'));
+  }
 }

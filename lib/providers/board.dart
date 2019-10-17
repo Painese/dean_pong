@@ -13,10 +13,12 @@ class Board with ChangeNotifier {
   FirebaseService _fb = FirebaseService.instance;
 
   Future<void> initialize() async {
+    print('Initialize called');
     final Response response = await _fb.fetchBoardFromDatabase();
     final jsonData = json.decode(response.body);
     final archive = KeyedArchive.unarchive(jsonData);
     _boardDetails = BoardDetails()..decode(archive);
+    print('Initialize finished');
     notifyListeners();
   }
 
