@@ -34,6 +34,10 @@ class BoardDetails extends Coding {
     } else {
       _state = BoardState.free;
     }
+
+    if(_currentPlayersIds == null) {
+      _currentPlayersIds = List<String>();
+    }
   }
 
   BoardState get state => _state;
@@ -60,8 +64,12 @@ class BoardDetails extends Coding {
     _state = boardDetails.state;
 
     if(boardDetails.currentPlayersIds != null) {
-      _currentPlayersIds = List<String>();
-      List.copyRange(_currentPlayersIds , 0, boardDetails.currentPlayersIds);
+//      _currentPlayersIds = List<String>();
+      currentPlayersIds = new List<String>.from(boardDetails.currentPlayersIds);
+
+//      for(String playerId in boardDetails.currentPlayersIds) {
+//        currentPlayersIds.add(playerId);
+//      }
     }
   }
 

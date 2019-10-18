@@ -95,6 +95,7 @@ class _BoardScreenState extends State<BoardScreen> {
   }
 
   /// Actions
+
   // TODO: respond to errors in the following async board actions.
   void _joinOrLeaveBoard(Board board) {
     if(board.isUserInBoard(myUserId)) {

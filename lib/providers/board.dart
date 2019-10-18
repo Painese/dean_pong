@@ -64,6 +64,7 @@ class Board with ChangeNotifier {
 
     _saveCurrentBoardDetails();
 
+    // TODO: this causes an exception!
     _boardDetails.currentPlayersIds.remove(userId);
 
     return await _updateBoardInDatabase();
@@ -104,6 +105,6 @@ class Board with ChangeNotifier {
   }
 
   bool isUserInBoard(String userId) {
-    return true;
+    return boardDetails.currentPlayersIds.contains(userId);
   }
 }
