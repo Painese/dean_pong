@@ -69,6 +69,14 @@ class Board with ChangeNotifier {
     return await _updateBoardInDatabase();
   }
 
+  Future<void> confirmCurrentBoardState() async {
+    _saveCurrentBoardDetails();
+
+    _boardDetails.numberOfWitnesses++;
+
+    return await _updateBoardInDatabase();
+  }
+
   /// Helper methods
 
   Future<void> _updateBoardInDatabase() async {
@@ -93,5 +101,9 @@ class Board with ChangeNotifier {
 
   void _undoLastBoardDetailsChange() {
     _boardDetails = _previousBoardDetails;
+  }
+
+  bool isUserInBoard(String userId) {
+    return true;
   }
 }
