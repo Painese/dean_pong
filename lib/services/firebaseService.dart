@@ -25,6 +25,10 @@ class FirebaseService {
     return _databaseService.fetchBoardFromDatabase();
   }
 
+  Future<Response> setUserDetailsInDatabase(String userId, String userName) async {
+    return _databaseService.setUserDetailsInDatabase(userId, userName);
+  }
+
   set authToken(String value) {
     // Update other services
     _databaseService.authToken = value;

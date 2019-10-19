@@ -17,6 +17,7 @@ class Board with ChangeNotifier {
     final Response response = await _fb.fetchBoardFromDatabase();
     final jsonData = json.decode(response.body);
     final archive = KeyedArchive.unarchive(jsonData);
+
     _boardDetails = BoardDetails()..decode(archive);
     print('Initialize finished');
     notifyListeners();
@@ -29,18 +30,13 @@ class Board with ChangeNotifier {
 
     final isSameState = newState == _boardDetails.state;
 
-    if (isSameState) {
-      _boardDetails.numberOfWitnesses++;
-    } else {
+    if (!isSameState) {
       _boardDetails.state = newState;
-      _boardDetails.numberOfWitnesses = 0;
-
-      if(_boardDetails.currentPlayersIds != null) {
-        _boardDetails.currentPlayersIds.clear();
-      }
+      _boardDetails.witnessesIds.clear();
+      _boardDetails.currentPlayersIds.clear();
+      return await _updateBoardInDatabase();
     }
 
-    return await _updateBoardInDatabase();
   }
 
   Future<void> joinCurrentGame(String userId) async {
@@ -64,18 +60,21 @@ class Board with ChangeNotifier {
 
     _saveCurrentBoardDetails();
 
-    // TODO: this causes an exception!
     _boardDetails.currentPlayersIds.remove(userId);
 
     return await _updateBoardInDatabase();
   }
 
-  Future<void> confirmCurrentBoardState() async {
-    _saveCurrentBoardDetails();
+  Future<void> confirmCurrentBoardState(String userId) async {
+    if(!_boardDetails.witnessesIds.contains(userId)) {
+      _saveCurrentBoardDetails();
+      _boardDetails.witnessesIds.add(userId);
+      return await _updateBoardInDatabase();
+    }
+  }
 
-    _boardDetails.numberOfWitnesses++;
-
-    return await _updateBoardInDatabase();
+  bool didUserConfirmBoardState(String userId) {
+    return _boardDetails.witnessesIds.contains(userId);
   }
 
   /// Helper methods

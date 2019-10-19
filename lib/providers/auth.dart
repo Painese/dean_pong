@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:async';
 
+import 'package:dean_pong/services/firebaseService.dart';
 import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -9,6 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class Auth with ChangeNotifier {
   static const String _webApiKey = "AIzaSyCarJOCn8fTpiHFbE73K2mFgxnZhpEPMFU";
   String _token;
+
   DateTime _expiryDate;
   String _userId;
   Timer _authTimer;
@@ -26,12 +28,18 @@ class Auth with ChangeNotifier {
     return null;
   }
 
+  set token(String value) {
+    _token = value;
+    FirebaseService.instance.authToken = _token;
+  }
+
   String get userId {
     return _userId;
   }
 
   Future<void> _authenticate(
       String email, String password, String urlSegment) async {
+    //TODO: move this to the FirebaseService -> Auth service.
     final url =
         'https://www.googleapis.com/identitytoolkit/v3/relyingparty/$urlSegment?key=$_webApiKey';
     try {
@@ -49,7 +57,7 @@ class Auth with ChangeNotifier {
       if (responseData['error'] != null) {
         throw Exception(responseData['error']['message']);
       }
-      _token = responseData['idToken'];
+      token = responseData['idToken'];
       _userId = responseData['localId'];
       _expiryDate = DateTime.now().add(
         Duration(
@@ -76,7 +84,9 @@ class Auth with ChangeNotifier {
   }
 
   Future<void> signup(String email, String password) async {
-    return _authenticate(email, password, 'signupNewUser');
+    await _authenticate(email, password, 'signupNewUser');
+    return _setUserDetailsInDatabase(email);
+
   }
 
   Future<void> login(String email, String password) async {
@@ -94,7 +104,7 @@ class Auth with ChangeNotifier {
     if (expiryDate.isBefore(DateTime.now())) {
       return false;
     }
-    _token = extractedUserData['token'];
+    token = extractedUserData['token'];
     _userId = extractedUserData['userId'];
     _expiryDate = expiryDate;
     notifyListeners();
@@ -103,7 +113,7 @@ class Auth with ChangeNotifier {
   }
 
   Future<void> logout() async {
-    _token = null;
+    token = null;
     _userId = null;
     _expiryDate = null;
     if (_authTimer != null) {
@@ -121,5 +131,16 @@ class Auth with ChangeNotifier {
     }
     final timeToExpiry = _expiryDate.difference(DateTime.now()).inSeconds;
     _authTimer = Timer(Duration(seconds: timeToExpiry), logout);
+  }
+
+  Future<void>_setUserDetailsInDatabase(String email) async {
+    final String userDisplayName = _getUserDisplayNameFromEmail(email);
+    return FirebaseService.instance.setUserDetailsInDatabase(_userId, userDisplayName);
+  }
+
+  // Return a substring of the email, from the start up to the '@' as the display name.
+  String _getUserDisplayNameFromEmail(String email) {
+    final int displayNameEndIndex = email.indexOf('@');
+    return email.substring(0, displayNameEndIndex);
   }
 }

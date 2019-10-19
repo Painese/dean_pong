@@ -78,24 +78,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _toggleBoardState(Board board) {
-    final newState = board.boardDetails.state == BoardState.free ? BoardState.matchInProgress : BoardState.free;
-    Color newColor;
 
-    board.setBoardState(newState).then( (_) {
-      if (newState == BoardState.free) {
-        newColor = Colors.green;
-      } else {
-        newColor = Colors.red;
-      }
-      setState(() {
-        _btnColor = newColor;
-      });
-    }).catchError((error) {
-      print(error.toString());
-      setState(() {
-        _btnColor = Colors.yellow;
-      });
-    });
   }
 
   @override

@@ -75,7 +75,7 @@ class _BoardScreenState extends State<BoardScreen> {
                   ),
                   RaisedButton(
                     child: Text('Confirm board state'),
-                    onPressed: () {
+                    onPressed: board.didUserConfirmBoardState(myUserId) ? null : () {
                       _confirmCurrentBoardState(board);
                     },
                   ),
@@ -106,7 +106,7 @@ class _BoardScreenState extends State<BoardScreen> {
   }
 
   void _confirmCurrentBoardState(Board board) {
-    board.confirmCurrentBoardState();
+    board.confirmCurrentBoardState(myUserId);
   }
 
   void _toggleBoardState(Board board) {

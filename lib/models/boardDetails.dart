@@ -4,7 +4,7 @@ import 'boardState.dart';
 
 class BoardDetails extends Coding {
   BoardState _state;
-  int _numberOfWitnesses;
+  List<String> _witnessesIds;
   List<String> _currentPlayersIds;
 
   /// Coding implementation
@@ -16,7 +16,7 @@ class BoardDetails extends Coding {
 
   @override
   void encode(KeyedArchive object) {
-    object.encode("numberOfWitnesses", _numberOfWitnesses);
+    object.encode("witnessesIds", _witnessesIds);
     object.encode("currentPlayersId", _currentPlayersIds);
     object.encode("state", _state.index);
   }
@@ -25,8 +25,9 @@ class BoardDetails extends Coding {
   void decode(KeyedArchive object) {
     super.decode(object);
 
-    _numberOfWitnesses = object.decode("numberOfWitnesses");
-    _currentPlayersIds = object.decode("currentPlayersId");
+    _witnessesIds = copyListFromDecodeObject(object, "witnessesIds");
+    _currentPlayersIds = copyListFromDecodeObject(object, "currentPlayersId");
+
     final stateInt = object.decode("state");
 
     if (stateInt == 0) {
@@ -40,6 +41,19 @@ class BoardDetails extends Coding {
     }
   }
 
+  List<T> copyListFromDecodeObject<T>(KeyedArchive object, String listId) {
+    final List<T> list = object.decode(listId); // Get list from decode object.
+    List<T> growableList;
+
+    if(list == null) {
+      growableList = List<T>();
+    } else {
+     growableList = List<T>.from(list, growable: true); // Copy list in order to make it a growable list.
+    }
+
+    return growableList;
+  }
+
   BoardState get state => _state;
 
   set state(BoardState value) {
@@ -48,28 +62,20 @@ class BoardDetails extends Coding {
 
   List<String> get currentPlayersIds => _currentPlayersIds;
 
-  set currentPlayersIds(List<String> value) {
-    _currentPlayersIds = value;
-  }
+  int get numberOfWitnesses => _witnessesIds.length;
 
-  int get numberOfWitnesses => _numberOfWitnesses;
-
-  set numberOfWitnesses(int value) {
-    _numberOfWitnesses = value;
-  }
+  List<String> get witnessesIds => _witnessesIds;
 
   /// Copy constructor
   BoardDetails.copy(BoardDetails boardDetails) {
-    _numberOfWitnesses =  boardDetails.numberOfWitnesses;
     _state = boardDetails.state;
 
-    if(boardDetails.currentPlayersIds != null) {
-//      _currentPlayersIds = List<String>();
-      currentPlayersIds = new List<String>.from(boardDetails.currentPlayersIds);
+    if(boardDetails._witnessesIds != null) {
+      _witnessesIds = List<String>.from(boardDetails._witnessesIds, growable: true);
+    }
 
-//      for(String playerId in boardDetails.currentPlayersIds) {
-//        currentPlayersIds.add(playerId);
-//      }
+    if(boardDetails.currentPlayersIds != null) {
+      _currentPlayersIds = List<String>.from(boardDetails.currentPlayersIds, growable: true);
     }
   }
 
